@@ -9,27 +9,30 @@
 <h1>CLASSIC TETRIS</h1>
 
 <div id="startScreen">
-    <h2>Ready?</h2>
-    <button id="startButton">START GAME</button>
+    <h2>准备好了吗？</h2>
+    <button id="startButton">开始游戏</button>
 </div>
 
 
-<p>Score: <span id="score">0</span></p>
-<p>Level: <span id="level">1</span></p>
+<p>成绩: <span id="score">0</span></p>
+<p>等级: <span id="level">1</span></p>
+<p>最高分: <span id="highScore">0</span></p>
 
 <canvas id="game" width="300" height="600"></canvas>
 <div id="nextBox">
-    <h3>NEXT</h3>
+    <h3>下一个</h3>
     <canvas id="next" width="120" height="120"></canvas>
 </div>
 
-<button id="restartButton">Restart</button>
+<button id="restartButton">重新游戏</button>
+<button id="pauseButton">暂停</button>
 
 <div class="controls">
-    <p>⬅️ ➡️ Move</p>
-    <p>⬇️ Speed Down</p>
-    <p>⬆️ Rotate</p>
-    <p>R Restart</p>
+    <p>⬅️ ➡️ 移动</p>
+    <p>⬇️ 加速</p>
+    <p>空格键硬降</p>
+    <p>⬆️ 旋转</p>
+    <p> R 重新游戏</p>
 </div>
 
     <script src="game.js"></script>

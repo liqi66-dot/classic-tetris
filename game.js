@@ -9,13 +9,21 @@ let score = 0;
 let level = 1;
 let dropSpeed = 500;
 
-let gameTimer;
-
 let gameOver = false;
 let gameStarted = false;
+let gameTimer;
+let paused = false;
+let countdown = 0;
 
 const scoreElement = document.getElementById("score");
 const levelElement = document.getElementById("level");
+
+const highScoreElement = document.getElementById("highScore");
+
+let highScore = 0;
+let newRecord = false;
+
+highScoreElement.textContent = highScore;
 
 const ROWS = 20;
 const COLS = 10;
@@ -156,6 +164,8 @@ function drawPiece() {
         for (let col = 0; col < piece.shape[row].length; col++) {
             if (piece.shape[row][col] === 1) {
                 ctx.fillStyle = piece.color;
+ctx.shadowColor = piece.color;
+ctx.shadowBlur = 10;
 
 ctx.fillRect(
     (piece.col + col) * BLOCK_SIZE,
@@ -173,6 +183,8 @@ ctx.strokeRect(
     BLOCK_SIZE - 2,
     BLOCK_SIZE - 2
 );
+
+ctx.shadowBlur = 0;
             }
         }
     }
@@ -193,10 +205,23 @@ if (event.key === "ArrowRight") {
         piece.col++;
     }
 }
+
 if (event.key === "ArrowDown") {
     if (!collision(piece.row + 1, piece.col)) {
         piece.row++;
     }
+}
+
+if (event.code === "Space") {
+    event.preventDefault();
+
+    while (!collision(piece.row + 1, piece.col)) {
+        piece.row++;
+    }
+
+    mergePiece();
+    clearLines();
+    newPiece();
 }
 
 if (event.key === "ArrowUp") {
@@ -205,6 +230,7 @@ if (event.key === "ArrowUp") {
 
     drawBoard();
     drawPiece();
+    drawNewRecord();
 });
 
 
@@ -214,6 +240,13 @@ function startGameTimer() {
 
     gameTimer = setInterval(function() {
         if (!gameStarted) return;
+       if (paused) {
+    drawBoard();
+    drawPiece();
+    drawNewRecord();
+    drawPaused();
+    return;
+}
 
 if (gameOver) {
     drawGameOver();
@@ -332,16 +365,24 @@ function clearLines() {
             }
         }
 
-        if (full) {
+if (full) {
 
-            board.splice(row, 1);
+    board.splice(row, 1);
 
-            board.unshift(
-                Array(COLS).fill(0)
-            );
+    board.unshift(
+        Array(COLS).fill(0)
+    );
 
             score += 100;
 scoreElement.textContent = score;
+
+if (score >= highScore) {
+    newRecord = true;
+
+    highScore = score;
+    highScoreElement.textContent = highScore;
+    localStorage.setItem("highScore", highScore);
+}
 
 level = Math.floor(score / 500) + 1;
 levelElement.textContent = level;
@@ -357,12 +398,70 @@ dropSpeed = Math.max(100, 500 - (level - 1) * 50);
 }
 
 document.getElementById("startButton").addEventListener("click", function() {
-    gameStarted = true;
+    gameStarted = false;
 
     document.getElementById("startScreen").style.display = "none";
 
+    countdown = 3;
+
+    let countdownTimer = setInterval(function() {
+        drawBoard();
+        drawPiece();
+        drawCountdown();
+
+        countdown--;
+
+        if (countdown < 0) {
+    clearInterval(countdownTimer);
+    gameStarted = true;
     startGameTimer();
+}
+    }, 1000);
 });
+
+function drawPaused() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 32px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        "PAUSED",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+}
+
+function drawCountdown() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ffff";
+    ctx.font = "bold 60px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        countdown > 0 ? countdown : "GO!",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+}
+
+function drawNewRecord() {
+    if (!newRecord) return;
+
+    ctx.fillStyle = "#ffff00";
+    ctx.font = "bold 24px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        "NEW RECORD!",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+    );
+}
 
 function drawGameOver() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
@@ -395,6 +494,18 @@ document.addEventListener("keydown", function(event) {
 
 document.getElementById("restartButton").addEventListener("click", function() {
     location.reload();
+});
+
+document.getElementById("pauseButton").addEventListener("click", function() {
+    if (!gameStarted || gameOver) return;
+
+    paused = !paused;
+
+    if (paused) {
+        this.textContent = "RESUME";
+    } else {
+        this.textContent = "PAUSE";
+    }
 });
 
 function drawNextPiece() {
