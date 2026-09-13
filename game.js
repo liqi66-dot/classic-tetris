@@ -509,7 +509,9 @@ document.getElementById("pauseButton").addEventListener("click", function() {
     }
 });
 
-document.getElementById("leftButton").addEventListener("click", function() {
+document.getElementById("leftButton").addEventListener("pointerdown", function(event) {
+    event.preventDefault();
+
     if (!gameStarted || paused || gameOver) return;
 
     if (!collision(piece.row, piece.col - 1)) {
@@ -519,7 +521,6 @@ document.getElementById("leftButton").addEventListener("click", function() {
     drawBoard();
     drawPiece();
 });
-
 document.getElementById("rightButton").addEventListener("click", function() {
     if (!gameStarted || paused || gameOver) return;
 
