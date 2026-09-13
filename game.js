@@ -521,7 +521,7 @@ document.getElementById("leftButton").addEventListener("pointerdown", function(e
     drawBoard();
     drawPiece();
 });
-document.getElementById("rightButton").addEventListener("click", function() {
+document.getElementById("rightButton").addEventListener("pointerdown", function() {
     if (!gameStarted || paused || gameOver) return;
 
     if (!collision(piece.row, piece.col + 1)) {
@@ -532,7 +532,7 @@ document.getElementById("rightButton").addEventListener("click", function() {
     drawPiece();
 });
 
-document.getElementById("downButton").addEventListener("click", function() {
+document.getElementById("downButton").addEventListener("pointerdown", function() {
     if (!gameStarted || paused || gameOver) return;
 
     if (!collision(piece.row + 1, piece.col)) {
@@ -543,7 +543,7 @@ document.getElementById("downButton").addEventListener("click", function() {
     drawPiece();
 });
 
-document.getElementById("rotateButton").addEventListener("click", function() {
+document.getElementById("rotateButton").addEventListener("pointerdown", function() {
     if (!gameStarted || paused || gameOver) return;
 
     rotatePiece();
@@ -552,7 +552,7 @@ document.getElementById("rotateButton").addEventListener("click", function() {
     drawPiece();
 });
 
-document.getElementById("dropButton").addEventListener("click", function() {
+document.getElementById("dropButton").addEventListener("pointerdown", function() {
     if (!gameStarted || paused || gameOver) return;
 
     while (!collision(piece.row + 1, piece.col)) {
