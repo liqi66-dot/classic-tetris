@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classic Tetris</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<h1>CLASSIC TETRIS</h1>
+
+<div id="startScreen">
+    <h2>Ready?</h2>
+    <button id="startButton">START GAME</button>
+</div>
+
+
+<p>Score: <span id="score">0</span></p>
+<p>Level: <span id="level">1</span></p>
+
+<canvas id="game" width="300" height="600"></canvas>
+<div id="nextBox">
+    <h3>NEXT</h3>
+    <canvas id="next" width="120" height="120"></canvas>
+</div>
+
+<button id="restartButton">Restart</button>
+
+<div class="controls">
+    <p>⬅️ ➡️ Move</p>
+    <p>⬇️ Speed Down</p>
+    <p>⬆️ Rotate</p>
+    <p>R Restart</p>
+</div>
+
+    <script src="game.js"></script>
+
+</body>
+</html>

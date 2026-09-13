@@ -1,0 +1,98 @@
+body {
+    background: #111;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    font-size: 36px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+}
+
+canvas {
+    background: #222;
+    border: 3px solid white;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.controls {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.controls p {
+    margin: 5px;
+}
+
+#startScreen {
+    margin: 20px auto;
+    padding: 20px;
+    width: 250px;
+    border: 2px solid white;
+    border-radius: 10px;
+    background: #222;
+}
+
+#startScreen h2 {
+    margin-top: 0;
+    font-size: 28px;
+}
+
+#startButton {
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+}
+
+#game,
+#next {
+    background: #222;
+    border: 3px solid white;
+}
+
+#nextBox {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 20px;
+    padding: 10px;
+    background: #222;
+    border: 2px solid #555;
+    border-radius: 8px;
+}
+
+#nextBox h3 {
+    margin: 5px 0 10px;
+}
+
+
+p {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#score,
+#level {
+    color: #00ffff;
+    font-size: 22px;
+}
+
+#game {
+    vertical-align: top;
+}
+
+#next {
+    display: block;
+}
