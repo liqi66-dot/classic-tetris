@@ -492,6 +492,53 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
+document.getElementById("leftButton").addEventListener("click", function() {
+    if (!collision(piece.row, piece.col - 1)) {
+        piece.col--;
+    }
+
+    drawBoard();
+    drawPiece();
+});
+
+document.getElementById("rightButton").addEventListener("click", function() {
+    if (!collision(piece.row, piece.col + 1)) {
+        piece.col++;
+    }
+
+    drawBoard();
+    drawPiece();
+});
+
+document.getElementById("downButton").addEventListener("click", function() {
+    if (!collision(piece.row + 1, piece.col)) {
+        piece.row++;
+    }
+
+    drawBoard();
+    drawPiece();
+});
+
+document.getElementById("rotateButton").addEventListener("click", function() {
+    rotatePiece();
+
+    drawBoard();
+    drawPiece();
+});
+
+document.getElementById("dropButton").addEventListener("click", function() {
+    while (!collision(piece.row + 1, piece.col)) {
+        piece.row++;
+    }
+
+    mergePiece();
+    clearLines();
+    newPiece();
+
+    drawBoard();
+    drawPiece();
+});
+
 document.getElementById("restartButton").addEventListener("click", function() {
     location.reload();
 });
