@@ -389,9 +389,9 @@ button:hover {
 
 @media (max-width: 380px) {
 
-    #game {
-        width: 65vw;
-    }
+   #game {
+    width: 58vw;
+}
 
     #next {
         width: 60px;
