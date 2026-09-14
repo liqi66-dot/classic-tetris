@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classic Tetris</title>
@@ -7,6 +8,7 @@
 </head>
 
 <body>
+
 <h1>CLASSIC TETRIS</h1>
 
 <div id="startScreen">
@@ -14,42 +16,58 @@
     <button id="startButton">开始游戏</button>
 </div>
 
+<div class="info">
+    <p>成绩: <span id="score">0</span></p>
+    <p>等级: <span id="level">1</span></p>
+    <p>最高分: <span id="highScore">0</span></p>
+</div>
 
-<p>成绩: <span id="score">0</span></p>
-<p>等级: <span id="level">1</span></p>
-<p>最高分: <span id="highScore">0</span></p>
 
-<canvas id="game" width="300" height="600"></canvas>
+<!-- 游戏 + 手机控制 -->
+<div id="gameArea">
+
+    <canvas id="game" width="300" height="600"></canvas>
+
+    <div id="mobileControls">
+
+        <button id="rotateButton">🔄</button>
+
+        <div class="directionButtons">
+            <button id="leftButton">⬅️</button>
+            <button id="downButton">⬇️</button>
+            <button id="rightButton">➡️</button>
+        </div>
+
+        <button id="dropButton">⬇️ 硬降</button>
+
+    </div>
+
+</div>
+
+
+<!-- 下一个方块 -->
 <div id="nextBox">
     <h3>下一个</h3>
     <canvas id="next" width="120" height="120"></canvas>
 </div>
 
-<button id="restartButton">重新游戏</button>
-<button id="pauseButton">暂停</button>
 
-<div id="mobileControls">
-
-    <button id="leftButton">⬅️</button>
-    <button id="downButton">⬇️</button>
-    <button id="rightButton">➡️</button>
-
-    <br>
-
-    <button id="rotateButton">🔄 旋转</button>
-    <button id="dropButton">⬇️ 硬降</button>
-
+<div class="mainButtons">
+    <button id="restartButton">重新游戏</button>
+    <button id="pauseButton">暂停</button>
 </div>
+
 
 <div class="controls">
     <p>⬅️ ➡️ 移动</p>
     <p>⬇️ 加速</p>
     <p>空格键硬降</p>
     <p>⬆️ 旋转</p>
-    <p> R 重新游戏</p>
+    <p>R 重新游戏</p>
 </div>
 
-    <script src="game.js"></script>
+
+<script src="game.js"></script>
 
 </body>
 </html>
