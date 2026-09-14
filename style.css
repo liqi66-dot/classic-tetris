@@ -176,3 +176,49 @@ p {
         font-size: 12px;
     }
 }
+
+#mobileControls {
+    display: none;
+}
+
+@media (max-width: 600px) {
+
+    #mobileControls {
+        display: grid;
+        grid-template-columns: repeat(3, 60px);
+        gap: 6px;
+        justify-content: center;
+        margin: 10px auto;
+    }
+
+    #mobileControls button {
+        margin: 0;
+        padding: 12px 5px;
+        font-size: 18px;
+    }
+
+    #leftButton {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #downButton {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #rightButton {
+        grid-column: 3;
+        grid-row: 1;
+    }
+
+    #rotateButton {
+        grid-column: 1 / 3;
+        grid-row: 2;
+    }
+
+    #dropButton {
+        grid-column: 3;
+        grid-row: 2;
+    }
+}
