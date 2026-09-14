@@ -129,14 +129,23 @@ button:hover {
 
 
 /* =========================
+   右边区域
+========================= */
+
+.rightSide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* =========================
    下一个方块
 ========================= */
 
 #nextBox {
     display: inline-block;
-
-    margin-left: 10px;
-    margin-top: 10px;
 
     padding: 5px;
 
@@ -163,6 +172,10 @@ button:hover {
 ========================= */
 
 .mainButtons {
+    margin-top: 5px;
+}
+
+.mainButtons button {
     margin-top: 5px;
 }
 
@@ -200,29 +213,23 @@ button:hover {
 @media (max-width: 600px) {
 
     body {
-        padding: 8px;
+        padding: 6px;
         overflow-x: hidden;
     }
-
-
-    /* 标题 */
 
     h1 {
         font-size: 26px;
         letter-spacing: 2px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
-
-    /* 分数 */
-
     .info {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
     }
 
     .info p {
         font-size: 15px;
-        margin: 4px;
+        margin: 3px;
     }
 
     #score,
@@ -233,7 +240,7 @@ button:hover {
 
 
     /* =========================
-       游戏 + 按钮并排
+       游戏 + 右边区域
     ========================= */
 
     #gameArea {
@@ -242,12 +249,12 @@ button:hover {
         flex-direction: row;
 
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
 
-        gap: 8px;
+        gap: 7px;
 
         width: 100%;
-        margin: 8px auto;
+        margin: 5px auto 0;
     }
 
 
@@ -258,6 +265,49 @@ button:hover {
         height: auto;
 
         max-width: 300px;
+    }
+
+
+    /* =========================
+       右边区域
+    ========================= */
+
+    .rightSide {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: flex-start;
+
+        gap: 5px;
+
+        flex-shrink: 0;
+    }
+
+
+    /* =========================
+       下一个方块
+    ========================= */
+
+    #nextBox {
+        display: block;
+
+        margin: 0;
+
+        padding: 3px;
+
+        width: fit-content;
+    }
+
+    #nextBox h3 {
+        font-size: 14px;
+        margin: 2px 0 3px;
+    }
+
+    #next {
+        width: 70px;
+        height: 70px;
     }
 
 
@@ -273,68 +323,55 @@ button:hover {
         align-items: center;
         justify-content: center;
 
-        gap: 5px;
+        gap: 4px;
 
         flex-shrink: 0;
     }
 
-
     #mobileControls button {
         margin: 0;
 
-        width: 52px;
-        height: 48px;
+        width: 50px;
+        height: 45px;
 
-        padding: 5px;
+        padding: 4px;
 
-        font-size: 17px;
+        font-size: 16px;
 
         touch-action: manipulation;
     }
 
-
-    /* 左、下、右 */
-
     .directionButtons {
         display: flex;
 
-        gap: 4px;
+        gap: 3px;
     }
 
 
-    /* 硬降按钮 */
+    /* 硬降 */
 
     #dropButton {
-        width: 70px !important;
+        width: 68px !important;
 
-        font-size: 12px !important;
+        font-size: 11px !important;
     }
 
 
-    /* 下一个方块 */
+    /* =========================
+       重新游戏 / 暂停
+       紧跟游戏下面
+    ========================= */
 
-    #nextBox {
-        display: block;
-
-        width: fit-content;
-
-        margin: 8px auto;
-
-        padding: 4px;
+    .mainButtons {
+        margin-top: 4px;
     }
-
-    #next {
-        width: 80px;
-        height: 80px;
-    }
-
-
-    /* 重新游戏 / 暂停 */
 
     .mainButtons button {
-        padding: 8px 14px;
+        padding: 7px 12px;
 
-        font-size: 13px;
+        font-size: 12px;
+
+        margin-top: 0;
     }
 
 
@@ -343,7 +380,6 @@ button:hover {
     .controls {
         display: none;
     }
-
 }
 
 
@@ -357,16 +393,29 @@ button:hover {
         width: 65vw;
     }
 
-    #mobileControls button {
-        width: 46px;
-        height: 44px;
+    #next {
+        width: 60px;
+        height: 60px;
+    }
 
-        font-size: 15px;
+    #nextBox h3 {
+        font-size: 12px;
+    }
+
+    #mobileControls button {
+        width: 44px;
+        height: 41px;
+
+        font-size: 14px;
     }
 
     #dropButton {
-        width: 64px !important;
-        font-size: 11px !important;
+        width: 60px !important;
+        font-size: 10px !important;
     }
 
+    .mainButtons button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
 }

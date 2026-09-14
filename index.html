@@ -22,42 +22,47 @@
     <p>最高分: <span id="highScore">0</span></p>
 </div>
 
-
-<!-- 游戏 + 手机控制 -->
+<!-- 游戏区域 -->
 <div id="gameArea">
 
+    <!-- 游戏 -->
     <canvas id="game" width="300" height="600"></canvas>
 
-    <div id="mobileControls">
+    <!-- 右边区域 -->
+    <div class="rightSide">
 
-        <button id="rotateButton">🔄</button>
-
-        <div class="directionButtons">
-            <button id="leftButton">⬅️</button>
-            <button id="downButton">⬇️</button>
-            <button id="rightButton">➡️</button>
+        <!-- 下一个方块 -->
+        <div id="nextBox">
+            <h3>下一个</h3>
+            <canvas id="next" width="120" height="120"></canvas>
         </div>
 
-        <button id="dropButton">⬇️ 硬降</button>
+        <!-- 手机控制 -->
+        <div id="mobileControls">
+
+            <button id="rotateButton">🔄</button>
+
+            <div class="directionButtons">
+                <button id="leftButton">⬅️</button>
+                <button id="downButton">⬇️</button>
+                <button id="rightButton">➡️</button>
+            </div>
+
+            <button id="dropButton">⬇️ 硬降</button>
+
+        </div>
 
     </div>
 
 </div>
 
-
-<!-- 下一个方块 -->
-<div id="nextBox">
-    <h3>下一个</h3>
-    <canvas id="next" width="120" height="120"></canvas>
-</div>
-
-
+<!-- 重新游戏 / 暂停 -->
 <div class="mainButtons">
     <button id="restartButton">重新游戏</button>
     <button id="pauseButton">暂停</button>
 </div>
 
-
+<!-- 电脑操作说明 -->
 <div class="controls">
     <p>⬅️ ➡️ 移动</p>
     <p>⬇️ 加速</p>
@@ -65,7 +70,6 @@
     <p>⬆️ 旋转</p>
     <p>R 重新游戏</p>
 </div>
-
 
 <script src="game.js"></script>
 
