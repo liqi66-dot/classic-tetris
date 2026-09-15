@@ -1,435 +1,401 @@
-* {
-    box-sizing: border-box;
-}
-
 body {
+    background: #0a0101;
+    color: rgb(235, 228, 228);
+    text-align: center;
+    font-family: Arial, sans-serif;
     margin: 0;
-
-    min-height: 100vh;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-family: "Courier New", monospace;
-
-    background:
-        repeating-linear-gradient(
-            0deg,
-            #eeeeee 0px,
-            #eeeeee 2px,
-            #e8e8e8 2px,
-            #e8e8e8 4px
-        );
-
-    color: #222;
+    padding: 10px;
 }
-
-
-/* ====================
-   游戏整体
-==================== */
-
-.game-container {
-
-    width: 100%;
-    max-width: 460px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: 20px;
-}
-
-
-/* ====================
-   标题
-==================== */
 
 h1 {
-
-    margin: 0 0 15px;
-
-    font-family: "Courier New", monospace;
-
-    font-size: 30px;
-
-    letter-spacing: 2px;
-
-    text-align: center;
-}
-
-
-/* ====================
-   游戏资料
-==================== */
-
-.game-info {
-
-    width: min(90vw, 400px);
-
-    display: flex;
-    justify-content: space-between;
-
+    font-size: 36px;
+    letter-spacing: 4px;
     margin-bottom: 10px;
 
-    font-size: 14px;
+    color: #00ffff;
+
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;
+
     font-weight: bold;
 }
 
-.game-info div {
 
-    text-align: center;
+/* =========================
+   普通按钮
+========================= */
+
+button {
+    margin-top: 10px;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+
+    background: #1767a4;
+    color: #00ffff;
+
+    border: 2px solid #00ffff;
+    border-radius: 6px;
+
+    box-shadow:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff;
+
+    text-transform: uppercase;
 }
 
-.game-info span {
+button:hover {
+    background: #00ffff;
+    color: #111;
 
-    display: block;
+    box-shadow:
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;
+}
 
-    margin-top: 4px;
 
+/* =========================
+   开始画面
+========================= */
+
+#startScreen {
+    margin: 20px auto;
+    padding: 20px;
+
+    width: 250px;
+
+    border: 2px solid white;
+    border-radius: 10px;
+
+    background: #222;
+}
+
+#startScreen h2 {
+    margin-top: 0;
+    font-size: 28px;
+}
+
+#startButton {
+    padding: 12px 30px;
     font-size: 18px;
 }
 
 
-/* ====================
-   游戏区域
-==================== */
+/* =========================
+   分数
+========================= */
 
-.game-board {
+.info p {
+    font-size: 18px;
+    font-weight: bold;
+}
 
-    position: relative;
+#score,
+#level,
+#highScore {
+    color: #00ffff;
+    font-size: 22px;
 
-    width: min(90vw, 400px);
-    height: min(90vw, 400px);
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff;
 }
 
 
-canvas {
+/* =========================
+   游戏区域
+========================= */
 
-    width: 100%;
-    height: 100%;
+#gameArea {
+    display: flex;
 
-    display: block;
+    justify-content: center;
+    align-items: flex-start;
 
-    background: #111;
+    gap: 15px;
 
-    border: 5px solid #333;
+    margin-top: 10px;
+}
 
-    border-radius: 12px;
+#game {
+    background: #222;
+    border: 3px solid white;
+
+    vertical-align: top;
 
     touch-action: none;
 }
 
 
-/* ====================
-   开始 / Game Over 画面
-==================== */
+/* =========================
+   右边区域
+========================= */
 
-.game-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+.rightSide {
     display: flex;
+
     flex-direction: column;
-    justify-content: center;
+
     align-items: center;
-    text-align: center;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.88);
-    color: white;
+
+    gap: 8px;
+}
+
+
+/* =========================
+   下一个方块
+========================= */
+
+#nextBox {
+    display: inline-block;
+
+    padding: 5px;
+
+    background: #5c5858;
+
+    border: 2px solid #815c5c;
     border-radius: 8px;
-    overflow: hidden;
 }
 
-.game-screen h2 {
-
-    margin: 8px 0;
-
-    font-size: 30px;
+#nextBox h3 {
+    margin: 3px 0 5px;
 }
 
-.game-screen p {
+#next {
+    display: block;
 
-    line-height: 1.6;
-
-    font-size: 15px;
-
-    margin: 5px 0;
-}
-
-.screen-title {
-
-    font-size: 55px;
-
-    margin-bottom: 5px;
+    background: #222;
+    border: 3px solid white;
 }
 
 
-/* ====================
-   隐藏
-==================== */
+/* =========================
+   手机滑动提示
+========================= */
 
-.hidden {
-
-    display: none;
-}
-
-
-/* ====================
-   游戏按钮
-==================== */
-
-.game-buttons {
-
-    margin-top: 15px;
-}
-
-button {
-
-    border: none;
-
-    border-radius: 9px;
-
-    background: #333;
-
-    color: white;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: transform 0.1s;
-}
-
-button:active {
-
-    transform: scale(0.92);
-}
-
-
-/* 开始 / 再玩一次 */
-
-.game-screen button {
-
-    margin-top: 8px;
-
-    padding: 12px 25px;
-
-    background: #4CAF50;
-
-    font-size: 17px;
-}
-
-
-/* 暂停 */
-
-#pauseButton {
-
+#swipeHint {
     display: none;
 
-    padding: 9px 22px;
+    font-size: 11px;
+    color: #aaa;
+
+    line-height: 1.3;
+
+    user-select: none;
+    pointer-events: none;
+}
+
+#swipeHint p {
+    margin: 3px 0;
 }
 
 
-/* ====================
-   手机方向按钮
-==================== */
+/* =========================
+   重新游戏 / 暂停
+========================= */
+
+.mainButtons {
+    margin-top: 5px;
+}
+
+.mainButtons button {
+    margin-top: 5px;
+}
+
+
+/* =========================
+   电脑操作说明
+========================= */
 
 .controls {
-
     margin-top: 15px;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    font-size: 14px;
+    color: #aaa;
 }
 
-.controls button {
-
-    width: 58px;
-    height: 48px;
-
-    margin: 3px;
-
-    padding: 0;
-
-    font-size: 22px;
-
-    touch-action: manipulation;
-}
-
-.middle-buttons {
-
-    display: flex;
-
-    justify-content: center;
+.controls p {
+    margin: 5px;
 }
 
 
-/* ====================
-   手机
-==================== */
+/* ==================================================
+   📱 手机
+================================================== */
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
 
     body {
+        padding: 6px;
 
-        align-items: flex-start;
-
-        padding-top: 15px;
-    }
-
-    .game-container {
-
-        padding: 10px;
+        overflow-x: hidden;
     }
 
     h1 {
-
-        font-size: 25px;
+        font-size: 26px;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
     }
 
-    .game-info {
 
-        font-size: 13px;
+    /* 分数 */
+
+    .info {
+        margin-bottom: 3px;
     }
 
-    .game-info span {
-
-        font-size: 17px;
-    }
-}
-
-.new-high-score {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 18px;
-    background: #ffd700;
-    color: #222;
-    font-family: "Courier New", monospace;
-    font-size: 16px;
-    font-weight: bold;
-    white-space: nowrap;
-    border: 3px solid #222;
-    border-radius: 6px;
-    z-index: 5;
-    animation: highScorePop 0.5s ease;
-}
-
-@keyframes highScorePop {
-    0% {
-        transform: translateX(-50%) scale(0.5);
-        opacity: 0;
+    .info p {
+        font-size: 15px;
+        margin: 3px;
     }
 
-    100% {
-        transform: translateX(-50%) scale(1);
-        opacity: 1;
-    }
-}
-
-.eat-effect {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-family: "Courier New", monospace;
-    font-size: 24px;
-    font-weight: bold;
-    pointer-events: none;
-    z-index: 4;
-    animation: eatPop 0.45s ease-out;
-}
-
-@keyframes eatPop {
-    0% {
-        transform: translate(-50%, -50%) scale(0.5);
-        opacity: 0;
+    #score,
+    #level,
+    #highScore {
+        font-size: 18px;
     }
 
-    40% {
-        transform: translate(-50%, -65%) scale(1.2);
-        opacity: 1;
-    }
 
-    100% {
-        transform: translate(-50%, -90%) scale(1);
-        opacity: 0;
-    }
-}
+    /* =========================
+       游戏 + 右边区域
+    ========================= */
 
-.instructions {
-    margin-top: 6px;
-    padding: 6px 12px;
-    border-top: 2px solid #555;
-    border-bottom: 2px solid #555;
-    font-family: "Courier New", monospace;
-    font-size: 11px;
-    line-height: 1.3;
-}
+    #gameArea {
+        display: flex;
 
-.instructions strong {
-    display: block;
-    margin-bottom: 3px;
-    font-size: 13px;
-}
+        flex-direction: row;
 
-.instructions p {
-    margin: 2px 0;
-    font-size: 11px;
-}
-
-@media (max-width: 500px) {
-    .game-screen {
-        padding: 5px;
         justify-content: center;
+        align-items: flex-start;
+
+        gap: 7px;
+
+        width: 100%;
+
+        margin: 5px auto 0;
     }
 
-    .screen-title {
-        font-size: 35px;
+
+    /* 游戏 */
+
+    #game {
+        width: 60vw;
+        height: auto;
+
+        max-width: 300px;
+
+        touch-action: none;
+    }
+
+
+    /* =========================
+       右边
+    ========================= */
+
+    .rightSide {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: flex-start;
+
+        gap: 6px;
+
+        flex-shrink: 0;
+    }
+
+
+    /* =========================
+       下一个方块
+    ========================= */
+
+    #nextBox {
+        display: block;
+
         margin: 0;
+
+        padding: 3px;
+
+        width: fit-content;
     }
 
-    .game-screen h2 {
-        margin: 2px 0;
-        font-size: 21px;
+    #nextBox h3 {
+        font-size: 14px;
+
+        margin: 2px 0 3px;
     }
 
-    .game-description {
-        font-size: 11px !important;
-        line-height: 1.25 !important;
-        margin: 2px 0 !important;
+    #next {
+        width: 60px;
+        height: 60px;
     }
 
-    .instructions {
-        margin-top: 3px;
-        padding: 4px 10px;
-        font-size: 10px;
-        line-height: 1.2;
+
+    /* =========================
+       滑动提示
+    ========================= */
+
+    #swipeHint {
+        display: block;
     }
 
-    .instructions strong {
-        font-size: 11px;
-        margin-bottom: 1px;
-    }
 
-    .instructions p {
-        margin: 1px 0;
-        font-size: 10px;
-    }
+    /* =========================
+       重新游戏 / 暂停
+    ========================= */
 
-    .game-screen button {
+    .mainButtons {
         margin-top: 4px;
-        padding: 8px 16px;
-        font-size: 13px;
+    }
+
+    .mainButtons button {
+        padding: 7px 12px;
+
+        font-size: 12px;
+
+        margin-top: 0;
+    }
+
+
+    /* 手机隐藏电脑操作说明 */
+
+    .controls {
+        display: none;
+    }
+}
+
+
+/* ==================================================
+   📱 很小的手机
+================================================== */
+
+@media (max-width: 380px) {
+
+    #game {
+        width: 58vw;
+    }
+
+    #next {
+        width: 55px;
+        height: 55px;
+    }
+
+    #nextBox h3 {
+        font-size: 12px;
+    }
+
+    #swipeHint {
+        font-size: 10px;
+    }
+
+    .mainButtons button {
+        padding: 6px 10px;
+
+        font-size: 11px;
     }
 }

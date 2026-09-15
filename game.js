@@ -1,761 +1,651 @@
-let audioContext = null;
-
-function initAudio() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    if (audioContext.state === "suspended") {
-        audioContext.resume();
-    }
-}
-
-function playSound(frequency, duration, type = "square", volume = 0.08) {
-    if (!audioContext) return;
-
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.value = frequency;
-
-    gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + duration
-    );
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
-}
-
-function playStartSound() {
-    playSound(523, 0.08);
-    
-    setTimeout(() => {
-        playSound(659, 0.08);
-    }, 90);
-}
-
-function playEatSound() {
-    playSound(700, 0.07);
-    
-    setTimeout(() => {
-        playSound(900, 0.06);
-    }, 70);
-}
-
-function playGameOverSound() {
-    playSound(300, 0.15);
-    
-    setTimeout(() => {
-        playSound(200, 0.25);
-    }, 160);
-}
-
-function playPauseSound() {
-    playSound(450, 0.08);
-}
-
-const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-const scoreElement =
-    document.getElementById("score");
-
-const highScoreElement =
-    document.getElementById("highScore");
-
-const levelElement =
-    document.getElementById("level");
-
-const startButton =
-    document.getElementById("startButton");
-
-const restartButton =
-    document.getElementById("restartButton");
-
-const pauseButton =
-    document.getElementById("pauseButton");
-
-const startScreen =
-    document.getElementById("startScreen");
-
-const gameOverScreen =
-    document.getElementById("gameOverScreen");
-
-const finalScore =
-    document.getElementById("finalScore");
-
-const finalHighScore =
-    document.getElementById("finalHighScore");
-
-const upButton = document.getElementById("upButton");
-const downButton = document.getElementById("downButton");
-const leftButton = document.getElementById("leftButton");
-const rightButton = document.getElementById("rightButton");
-
-const gridSize = 20;
-
-
-// ====================
-// 游戏变量
-// ====================
-
-let snake = [
-    { x: 200, y: 200 },
-    { x: 180, y: 200 },
-    { x: 160, y: 200 }
-];
-
-let food = {
-    x: 100,
-    y: 100
-};
-
-let direction = "right";
+const nextCanvas = document.getElementById("next");
+const nextCtx = nextCanvas.getContext("2d");
 
 let score = 0;
 
-let highScore =
-    Number(localStorage.getItem("snakeHighScore")) || 0;
+let level = 1;
+let dropSpeed = 500;
 
-let gameRunning = false;
-let gamePaused = false;
-
+let gameOver = false;
+let gameStarted = false;
 let gameTimer;
+let paused = false;
+let countdown = 0;
 
-let currentLevel = 1;
+const scoreElement = document.getElementById("score");
+const levelElement = document.getElementById("level");
 
-let gameSpeed = 150;
+const highScoreElement = document.getElementById("highScore");
 
+let highScore = 0;
+let newRecord = false;
 
-// 显示最高分
 highScoreElement.textContent = highScore;
 
+const ROWS = 20;
+const COLS = 10;
+const BLOCK_SIZE = 30;
 
-// ====================
-// 画蛇
-// ====================
+let board = [];
 
-function drawSnake() {
-    snake.forEach((segment, index) => {
+function createBoard() {
+    board = [];
 
-        // 蛇头
-        if (index === 0) {
-            ctx.fillStyle = "#4CAF50";
-            ctx.fillRect(segment.x, segment.y, 20, 20);
+    for (let row = 0; row < ROWS; row++) {
+        board[row] = [];
 
-            // 眼睛
-            ctx.fillStyle = "#000";
+        for (let col = 0; col < COLS; col++) {
+            board[row][col] = 0;
+        }
+    }
+}
 
-            if (direction === "right") {
-                ctx.fillRect(segment.x + 14, segment.y + 4, 3, 3);
-                ctx.fillRect(segment.x + 14, segment.y + 13, 3, 3);
-            } else if (direction === "left") {
-                ctx.fillRect(segment.x + 3, segment.y + 4, 3, 3);
-                ctx.fillRect(segment.x + 3, segment.y + 13, 3, 3);
-            } else if (direction === "up") {
-                ctx.fillRect(segment.x + 4, segment.y + 3, 3, 3);
-                ctx.fillRect(segment.x + 13, segment.y + 3, 3, 3);
-            } else if (direction === "down") {
-                ctx.fillRect(segment.x + 4, segment.y + 14, 3, 3);
-                ctx.fillRect(segment.x + 13, segment.y + 14, 3, 3);
+createBoard();
+
+
+
+function drawBoard() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+
+            if (board[row][col]) {
+                ctx.fillStyle = board[row][col];
+
+                ctx.fillRect(
+                    col * BLOCK_SIZE,
+                    row * BLOCK_SIZE,
+                    BLOCK_SIZE,
+                    BLOCK_SIZE
+                );
             }
 
-        } else {
-            // 蛇身体
-            ctx.fillStyle = "#66BB6A";
-            ctx.fillRect(segment.x + 1, segment.y + 1, 18, 18);
+            ctx.strokeStyle = "#444";
+
+            ctx.strokeRect(
+                col * BLOCK_SIZE,
+                row * BLOCK_SIZE,
+                BLOCK_SIZE,
+                BLOCK_SIZE
+            );
         }
-    });
+    }
 }
 
+drawBoard();
 
-// ====================
-// 画食物
-// ====================
+const pieces = [
 
-function drawFood() {
-    // 苹果
-    ctx.fillStyle = "#ff3333";
+    // I
+    [
+        [1, 1, 1, 1]
+    ],
 
-    ctx.fillRect(food.x + 4, food.y + 5, 12, 12);
-    ctx.fillRect(food.x + 2, food.y + 8, 16, 7);
+    // O
+    [
+        [1, 1],
+        [1, 1]
+    ],
 
-    // 苹果梗
-    ctx.fillStyle = "#6b3e26";
-    ctx.fillRect(food.x + 9, food.y + 1, 3, 5);
+    // T
+    [
+        [0, 1, 0],
+        [1, 1, 1]
+    ],
 
-    // 叶子
-    ctx.fillStyle = "#4CAF50";
-    ctx.fillRect(food.x + 12, food.y + 2, 5, 3);
+    // S
+    [
+        [0, 1, 1],
+        [1, 1, 0]
+    ],
+
+    // Z
+    [
+        [1, 1, 0],
+        [0, 1, 1]
+    ],
+
+    // J
+    [
+        [1, 0, 0],
+        [1, 1, 1]
+    ],
+
+    // L
+    [
+        [0, 0, 1],
+        [1, 1, 1]
+    ]
+];
+
+const colors = [
+    "cyan",     // I
+    "yellow",   // O
+    "purple",   // T
+    "green",    // S
+    "red",      // Z
+    "blue",     // J
+    "orange"    // L
+];
+
+
+
+function randomPiece() {
+    const randomIndex = Math.floor(
+        Math.random() * pieces.length
+    );
+
+    return {
+        shape: pieces[randomIndex],
+        color: colors[randomIndex]
+    };
 }
 
-// ====================
-// 生成食物
-// ====================
+let random = randomPiece();
 
-function generateFood() {
+let piece = {
+    shape: random.shape,
+    color: random.color,
+    row: 0,
+    col: 3
+};
 
-    const maxPosition =
-        canvas.width / gridSize;
+let nextPiece = randomPiece();
+drawNextPiece();
 
-    food.x =
-        Math.floor(Math.random() * maxPosition)
-        * gridSize;
 
-    food.y =
-        Math.floor(Math.random() * maxPosition)
-        * gridSize;
+
+function drawPiece() {
+    for (let row = 0; row < piece.shape.length; row++) {
+        for (let col = 0; col < piece.shape[row].length; col++) {
+            if (piece.shape[row][col] === 1) {
+                ctx.fillStyle = piece.color;
+ctx.shadowColor = piece.color;
+ctx.shadowBlur = 10;
+
+ctx.fillRect(
+    (piece.col + col) * BLOCK_SIZE,
+    (piece.row + row) * BLOCK_SIZE,
+    BLOCK_SIZE,
+    BLOCK_SIZE
+);
+
+ctx.strokeStyle = "white";
+ctx.lineWidth = 2;
+
+ctx.strokeRect(
+    (piece.col + col) * BLOCK_SIZE + 1,
+    (piece.row + row) * BLOCK_SIZE + 1,
+    BLOCK_SIZE - 2,
+    BLOCK_SIZE - 2
+);
+
+ctx.shadowBlur = 0;
+            }
+        }
+    }
 }
 
-// ====================
-// 等级系统
-// ====================
+drawPiece();
 
-function updateLevel() {
+document.addEventListener("keydown", function(event) {
 
-    let newLevel;
+if (event.key === "ArrowLeft") {
+    if (!collision(piece.row, piece.col - 1)) {
+        piece.col--;
+    }
+}
 
-    if (score >= 20) {
-        newLevel = 4;
-    } else if (score >= 10) {
-        newLevel = 3;
-    } else if (score >= 5) {
-        newLevel = 2;
-    } else {
-        newLevel = 1;
+if (event.key === "ArrowRight") {
+    if (!collision(piece.row, piece.col + 1)) {
+        piece.col++;
+    }
+}
+
+if (event.key === "ArrowDown") {
+    if (!collision(piece.row + 1, piece.col)) {
+        piece.row++;
+    }
+}
+
+if (event.code === "Space") {
+    event.preventDefault();
+
+    while (!collision(piece.row + 1, piece.col)) {
+        piece.row++;
     }
 
-    // 没有升级就不用重新设置速度
-    if (newLevel === currentLevel) {
-        return;
-    }
+    mergePiece();
+    clearLines();
+    newPiece();
+}
 
-    currentLevel = newLevel;
+if (event.key === "ArrowUp") {
+    rotatePiece();
+}
 
-    levelElement.textContent = currentLevel;
+    drawBoard();
+    drawPiece();
+    drawNewRecord();
+});
 
-    // 等级越高，速度越快
-    if (currentLevel === 1) {
-        gameSpeed = 150;
-    }
 
-    if (currentLevel === 2) {
-        gameSpeed = 120;
-    }
 
-    if (currentLevel === 3) {
-        gameSpeed = 90;
-    }
-
-    if (currentLevel === 4) {
-        gameSpeed = 65;
-    }
-
-    // 重新启动游戏计时器
+function startGameTimer() {
     clearInterval(gameTimer);
 
-    gameTimer = setInterval(
-        gameLoop,
-        gameSpeed
-    );
+    gameTimer = setInterval(function() {
+        if (!gameStarted) return;
+       if (paused) {
+    drawBoard();
+    drawPiece();
+    drawNewRecord();
+    drawPaused();
+    return;
 }
 
-
-// ====================
-// 撞墙
-// ====================
-
-function checkWallCollision(head) {
-
-    return (
-        head.x < 0 ||
-        head.x >= canvas.width ||
-        head.y < 0 ||
-        head.y >= canvas.height
-    );
+if (gameOver) {
+    drawGameOver();
+    return;
 }
 
+        if (!collision(piece.row + 1, piece.col)) {
+            piece.row++;
+        } else {
+            mergePiece();
+            clearLines();
+            newPiece();
 
-// ====================
-// 撞自己
-// ====================
+            if (collision(piece.row, piece.col)) {
+                gameOver = true;
+            }
+        }
 
-function checkSelfCollision(head) {
+        drawBoard();
+        drawPiece();
+    }, dropSpeed);
+}
 
-    for (let i = 1; i < snake.length; i++) {
+startGameTimer();
 
-        if (
-            head.x === snake[i].x &&
-            head.y === snake[i].y
-        ) {
-            return true;
+function collision(row, col) {
+
+    for (let r = 0; r < piece.shape.length; r++) {
+
+        for (let c = 0; c < piece.shape[r].length; c++) {
+
+            if (piece.shape[r][c] === 1) {
+
+                let newRow = row + r;
+                let newCol = col + c;
+
+                // 撞到左右边界或底部
+                if (
+                    newRow >= ROWS ||
+                    newCol < 0 ||
+                    newCol >= COLS
+                ) {
+                    return true;
+                }
+
+                // 撞到已经固定的方块
+               if (board[newRow][newCol]) {
+    return true;
+}
+            }
         }
     }
 
     return false;
 }
 
+function mergePiece() {
 
-// ====================
-// 移动蛇
-// ====================
+    for (let row = 0; row < piece.shape.length; row++) {
 
-function moveSnake() {
+        for (let col = 0; col < piece.shape[row].length; col++) {
 
-    const head = {
-        x: snake[0].x,
-        y: snake[0].y
-    };
+            if (piece.shape[row][col] === 1) {
 
+                board[piece.row + row][piece.col + col] = piece.color;
 
-    if (direction === "up") {
-        head.y -= gridSize;
-    }
-
-    if (direction === "down") {
-        head.y += gridSize;
-    }
-
-    if (direction === "left") {
-        head.x -= gridSize;
-    }
-
-    if (direction === "right") {
-        head.x += gridSize;
-    }
-
-
-    // 撞墙
-    if (checkWallCollision(head)) {
-        gameOver();
-        return;
-    }
-
-
-    // 撞自己
-    if (checkSelfCollision(head)) {
-        gameOver();
-        return;
-    }
-
-
-    snake.unshift(head);
-
-
-    // 吃食物
-    if (
-        head.x === food.x &&
-        head.y === food.y
-    ) {
-
-score++;
-
-playEatSound();
-showEatEffect();
-
-scoreElement.textContent = score;
-
-// 检查是否升级
-updateLevel();
-
-        // 更新最高分
-if (score > highScore) {
-    highScore = score;
-
-    localStorage.setItem("snakeHighScore", highScore);
-
-    highScoreElement.textContent = highScore;
-
-    showNewHighScore();
-}
-
-        generateFood();
-
-    } else {
-
-        snake.pop();
+            }
+        }
     }
 }
 
+function newPiece() {
+    piece.shape = nextPiece.shape;
+    piece.color = nextPiece.color;
+    piece.row = 0;
+    piece.col = 3;
 
-// ====================
-// 游戏画面
-// ====================
+    nextPiece = randomPiece();
 
-function drawGame() {
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    drawGrid();
-    drawSnake();
-    drawFood();
+    drawNextPiece();
 }
 
-function drawGrid() {
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = 1;
+function rotatePiece() {
+    const oldShape = piece.shape;
+    const rows = oldShape.length;
+    const cols = oldShape[0].length;
 
-    for (let x = 0; x <= canvas.width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+    let newShape = [];
+
+    for (let col = 0; col < cols; col++) {
+        newShape[col] = [];
+
+        for (let row = rows - 1; row >= 0; row--) {
+            newShape[col].push(oldShape[row][col]);
+        }
     }
 
-    for (let y = 0; y <= canvas.height; y += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-}
+    piece.shape = newShape;
 
-
-// ====================
-// 游戏循环
-// ====================
-
-function gameLoop() {
-
-    if (!gameRunning || gamePaused) {
-        return;
-    }
-
-    moveSnake();
-
-    if (gameRunning) {
-        drawGame();
+    if (collision(piece.row, piece.col)) {
+        piece.shape = oldShape;
     }
 }
 
+function clearLines() {
 
-// ====================
-// Game Over
-// ====================
+    for (let row = ROWS - 1; row >= 0; row--) {
 
-function gameOver() {
+        let full = true;
 
-    playGameOverSound();
+        for (let col = 0; col < COLS; col++) {
 
-    gameRunning = false;
-    gamePaused = false;
+            if (board[row][col] === 0) {
+                full = false;
+                break;
+            }
+        }
 
-    clearInterval(gameTimer);
+if (full) {
 
-    pauseButton.style.display = "none";
+    board.splice(row, 1);
 
-    // 显示最终分数
-    finalScore.textContent = score;
-
-    finalHighScore.textContent = highScore;
-
-    // 显示 Game Over
-    gameOverScreen.classList.remove("hidden");
-}
-
-
-// ====================
-// 开始 / 重新开始
-// ====================
-
-function startGame() {
-
-    initAudio();
-playStartSound();
-
-    clearInterval(gameTimer);
-
-    // 重置蛇
-    snake = [
-        { x: 200, y: 200 },
-        { x: 180, y: 200 },
-        { x: 160, y: 200 }
-    ];
-
-    // 重置方向
-    direction = "right";
-
-    // 重置分数
-    score = 0;
-
-    scoreElement.textContent = score;
-
-    // 重置等级
-    currentLevel = 1;
-    gameSpeed = 150;
-
-    levelElement.textContent = currentLevel;
-
-    // 生成食物
-    generateFood();
-
-    // 游戏状态
-    gameRunning = true;
-    gamePaused = false;
-
-    // 隐藏开始和 Game Over
-    startScreen.classList.add("hidden");
-    gameOverScreen.classList.add("hidden");
-
-    // 显示暂停
-    pauseButton.style.display = "inline-block";
-
-    pauseButton.textContent = "⏸ Pause";
-
-    // 开始游戏
-    gameTimer = setInterval(
-        gameLoop,
-        gameSpeed
+    board.unshift(
+        Array(COLS).fill(0)
     );
 
-    drawGame();
+            score += 100;
+scoreElement.textContent = score;
+
+if (score >= highScore) {
+    newRecord = true;
+
+    highScore = score;
+    highScoreElement.textContent = highScore;
+    localStorage.setItem("highScore", highScore);
 }
 
+level = Math.floor(score / 500) + 1;
+levelElement.textContent = level;
 
-// 开始按钮
-startButton.addEventListener(
-    "click",
-    startGame
-);
+dropSpeed = Math.max(100, 500 - (level - 1) * 50);
 
 
-// 再玩一次
-restartButton.addEventListener(
-    "click",
-    startGame
-);
 
 
-// ====================
-// 暂停 / 继续
-// ====================
-
-pauseButton.addEventListener("click", function() {
-
-    playPauseSound();
-
-    if (!gameRunning) {
-        return;
+            row++;
+        }
     }
+}
 
-    gamePaused = !gamePaused;
+document.getElementById("startButton").addEventListener("click", function() {
+    gameStarted = false;
 
-    if (gamePaused) {
+    document.getElementById("startScreen").style.display = "none";
 
-        pauseButton.textContent = "Resume";
+    countdown = 3;
 
-    } else {
+    let countdownTimer = setInterval(function() {
+        drawBoard();
+        drawPiece();
+        drawCountdown();
 
-        pauseButton.textContent = "Pause";
-    }
+        countdown--;
+
+        if (countdown < 0) {
+    clearInterval(countdownTimer);
+    gameStarted = true;
+    startGameTimer();
+}
+    }, 1000);
 });
 
-function playHighScoreSound() {
-    playSound(800, 0.08);
+function drawPaused() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    setTimeout(() => {
-        playSound(1000, 0.08);
-    }, 90);
+    ctx.fillStyle = "white";
+    ctx.font = "bold 32px Arial";
+    ctx.textAlign = "center";
 
-    setTimeout(() => {
-        playSound(1200, 0.12);
-    }, 180);
+    ctx.fillText(
+        "PAUSED",
+        canvas.width / 2,
+        canvas.height / 2
+    );
 }
 
-// ====================
-// 键盘控制
-// ====================
+function drawCountdown() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ffff";
+    ctx.font = "bold 60px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        countdown > 0 ? countdown : "GO!",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+}
+
+function drawNewRecord() {
+    if (!newRecord) return;
+
+    ctx.fillStyle = "#ffff00";
+    ctx.font = "bold 24px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        "NEW RECORD!",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+    );
+}
+
+function drawGameOver() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 32px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+        "GAME OVER",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+
+    ctx.font = "18px Arial";
+
+    ctx.fillText(
+        "Press R to Restart",
+        canvas.width / 2,
+        canvas.height / 2 + 40
+    );
+}
 
 document.addEventListener("keydown", function(event) {
-
-    if (
-        event.key === "ArrowUp" &&
-        direction !== "down"
-    ) {
-        direction = "up";
-    }
-
-    if (
-        event.key === "ArrowDown" &&
-        direction !== "up"
-    ) {
-        direction = "down";
-    }
-
-    if (
-        event.key === "ArrowLeft" &&
-        direction !== "right"
-    ) {
-        direction = "left";
-    }
-
-    if (
-        event.key === "ArrowRight" &&
-        direction !== "left"
-    ) {
-        direction = "right";
+    if (event.key.toLowerCase() === "r" && gameOver) {
+        location.reload();
     }
 });
 
 
-// ====================
-// 手机按钮
-// ====================
+document.getElementById("restartButton").addEventListener("click", function() {
+    location.reload();
+});
 
-upButton.addEventListener("click", function() {
+document.getElementById("pauseButton").addEventListener("click", function() {
+    if (!gameStarted || gameOver) return;
 
-    if (direction !== "down") {
-        direction = "up";
+    paused = !paused;
+
+    if (paused) {
+        this.textContent = "RESUME";
+    } else {
+        this.textContent = "PAUSE";
     }
 });
 
-downButton.addEventListener("click", function() {
-
-    if (direction !== "up") {
-        direction = "down";
-    }
-});
-
-leftButton.addEventListener("click", function() {
-
-    if (direction !== "right") {
-        direction = "left";
-    }
-});
-
-rightButton.addEventListener("click", function() {
-
-    if (direction !== "left") {
-        direction = "right";
-    }
-});
-
-
-// ====================
-// 手机滑动
-// ====================
+/* =========================
+   📱 手机滑动控制
+========================= */
 
 let touchStartX = 0;
 let touchStartY = 0;
+let touchStartTime = 0;
 
-canvas.addEventListener(
-    "touchstart",
-    function(event) {
+canvas.addEventListener("touchstart", function(event) {
 
-        const touch = event.touches[0];
+    if (!gameStarted || paused || gameOver) return;
 
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
+    const touch = event.touches[0];
 
-    },
-    { passive: true }
-);
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchStartTime = Date.now();
 
-
-canvas.addEventListener(
-    "touchend",
-    function(event) {
-
-        const touch = event.changedTouches[0];
-
-        const touchEndX = touch.clientX;
-        const touchEndY = touch.clientY;
-
-        const differenceX =
-            touchEndX - touchStartX;
-
-        const differenceY =
-            touchEndY - touchStartY;
-
-        const minimumSwipe = 30;
+}, { passive: false });
 
 
-        if (
-            Math.abs(differenceX) <
-            minimumSwipe &&
-            Math.abs(differenceY) <
-            minimumSwipe
-        ) {
-            return;
-        }
+canvas.addEventListener("touchend", function(event) {
+
+    if (!gameStarted || paused || gameOver) return;
+
+    event.preventDefault();
+
+    const touch = event.changedTouches[0];
+
+    const endX = touch.clientX;
+    const endY = touch.clientY;
+
+    const deltaX = endX - touchStartX;
+    const deltaY = endY - touchStartY;
+
+    const distanceX = Math.abs(deltaX);
+    const distanceY = Math.abs(deltaY);
+
+    const touchTime = Date.now() - touchStartTime;
 
 
-        if (
-            Math.abs(differenceX) >
-            Math.abs(differenceY)
-        ) {
+    /* =========================
+       左右滑动
+    ========================= */
 
-            if (
-                differenceX > 0 &&
-                direction !== "left"
-            ) {
-                direction = "right";
-            }
+    if (distanceX > distanceY && distanceX > 30) {
 
-            if (
-                differenceX < 0 &&
-                direction !== "right"
-            ) {
-                direction = "left";
+        if (deltaX > 0) {
+
+            // 右滑
+            if (!collision(piece.row, piece.col + 1)) {
+                piece.col++;
             }
 
         } else {
 
-            if (
-                differenceY > 0 &&
-                direction !== "up"
-            ) {
-                direction = "down";
-            }
-
-            if (
-                differenceY < 0 &&
-                direction !== "down"
-            ) {
-                direction = "up";
+            // 左滑
+            if (!collision(piece.row, piece.col - 1)) {
+                piece.col--;
             }
         }
 
-    },
-    { passive: true }
-);
+        drawBoard();
+        drawPiece();
+
+        return;
+    }
 
 
-// ====================
-// 第一次显示
-// ====================
+    /* =========================
+       上下滑动
+    ========================= */
 
-drawGame();
+    if (distanceY > distanceX && distanceY > 30) {
 
-function showNewHighScore() {
-    const newHighScore = document.getElementById("newHighScore");
+        if (deltaY < 0) {
 
-    newHighScore.classList.remove("hidden");
+            // 👆 上滑 = 旋转
+            rotatePiece();
 
-    playHighScoreSound();
+        } else {
 
-    setTimeout(() => {
-        newHighScore.classList.add("hidden");
-    }, 1500);
-}
+            // 👇 下滑
+            // 快速下滑 = 硬降
+            if (touchTime < 250) {
 
-function showEatEffect() {
-    const effect = document.getElementById("eatEffect");
+                while (!collision(piece.row + 1, piece.col)) {
+                    piece.row++;
+                }
 
-    effect.classList.remove("hidden");
+                mergePiece();
+                clearLines();
+                newPiece();
 
-    // 重新启动动画
-    effect.style.animation = "none";
-    void effect.offsetWidth;
-    effect.style.animation = "eatPop 0.45s ease-out";
+            } else {
 
-    setTimeout(() => {
-        effect.classList.add("hidden");
-    }, 450);
+                // 普通下滑 = 加速一格
+                if (!collision(piece.row + 1, piece.col)) {
+                    piece.row++;
+                }
+            }
+        }
+
+        drawBoard();
+        drawPiece();
+    }
+
+}, { passive: false });
+
+function drawNextPiece() {
+    nextCtx.clearRect(
+        0,
+        0,
+        nextCanvas.width,
+        nextCanvas.height
+    );
+
+    nextCtx.fillStyle = nextPiece.color;
+
+    const blockSize = 25;
+
+    const width = nextPiece.shape[0].length * blockSize;
+    const height = nextPiece.shape.length * blockSize;
+
+    const startX = (nextCanvas.width - width) / 2;
+    const startY = (nextCanvas.height - height) / 2;
+
+    for (let row = 0; row < nextPiece.shape.length; row++) {
+        for (let col = 0; col < nextPiece.shape[row].length; col++) {
+            if (nextPiece.shape[row][col] === 1) {
+                nextCtx.fillRect(
+                    startX + col * blockSize,
+                    startY + row * blockSize,
+                    blockSize,
+                    blockSize
+                );
+            }
+        }
+    }
 }
