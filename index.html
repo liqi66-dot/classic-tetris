@@ -1,77 +1,191 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classic Tetris</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Classic Snake</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>CLASSIC TETRIS</h1>
+    <div class="game-container">
 
-<div id="startScreen">
-    <h2>准备好了吗？</h2>
-    <button id="startButton">开始游戏</button>
-</div>
+        <!-- ====================
+             游戏标题
+        ==================== -->
 
-<div class="info">
-    <p>成绩: <span id="score">0</span></p>
-    <p>等级: <span id="level">1</span></p>
-    <p>最高分: <span id="highScore">0</span></p>
-</div>
+        <h1>🐍 CLASSIC SNAKE</h1>
 
-<!-- 游戏区域 -->
-<div id="gameArea">
 
-    <!-- 游戏 -->
-    <canvas id="game" width="300" height="600"></canvas>
+        <!-- ====================
+             游戏资料
+        ==================== -->
 
-    <!-- 右边区域 -->
-    <div class="rightSide">
+        <div class="game-info">
 
-        <!-- 下一个方块 -->
-        <div id="nextBox">
-            <h3>下一个</h3>
-            <canvas id="next" width="120" height="120"></canvas>
-        </div>
-
-        <!-- 手机控制 -->
-        <div id="mobileControls">
-
-            <button id="rotateButton">🔄</button>
-
-            <div class="directionButtons">
-                <button id="leftButton">⬅️</button>
-                <button id="downButton">⬇️</button>
-                <button id="rightButton">➡️</button>
+            <div>
+                Score
+                <span id="score">0</span>
             </div>
 
-            <button id="dropButton">⬇️ 硬降</button>
+            <div>
+                High Score
+                <span id="highScore">0</span>
+            </div>
+
+            <div>
+                Level
+                <span id="level">1</span>
+            </div>
+
+        </div>
+
+
+        <!-- ====================
+             游戏画面
+        ==================== -->
+
+        <div class="game-board">
+
+            <canvas
+                id="gameCanvas"
+                width="400"
+                height="400"
+            ></canvas>
+
+            <div id="eatEffect" class="eat-effect hidden">
+    +1
+</div>
+
+            <div id="newHighScore" class="new-high-score hidden">
+    🏆 NEW HIGH SCORE!
+</div>
+
+
+            <!-- ====================
+                 开始画面
+            ==================== -->
+
+            <div
+                id="startScreen"
+                class="game-screen"
+            >
+
+                <div class="screen-title">
+                    🐍
+                </div>
+
+                <h2>CLASSIC SNAKE</h2>
+
+               <p class="game-description">
+    Eat the food 🍎<br>
+    Grow longer 🐍<br>
+    Get the highest score! 🏆
+</p>
+
+<div class="instructions">
+    <strong>HOW TO PLAY</strong>
+    <p>💻 Arrow Keys</p>
+    <p>📱 Swipe or Buttons</p>
+</div>
+
+                <button id="startButton">
+                    ▶ START GAME
+                </button>
+
+            </div>
+
+
+            <!-- ====================
+                 Game Over
+            ==================== -->
+
+            <div
+                id="gameOverScreen"
+                class="game-screen hidden"
+            >
+
+                <div class="screen-title">
+                    💀
+                </div>
+
+                <h2>GAME OVER</h2>
+
+                <p>
+                    Score:
+                    <strong id="finalScore">0</strong>
+                </p>
+
+                <p>
+                    High Score:
+                    <strong id="finalHighScore">0</strong>
+                </p>
+
+                <button id="restartButton">
+                    🔄 PLAY AGAIN
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================
+             游戏按钮
+        ==================== -->
+
+        <div class="game-buttons">
+
+            <button
+                id="pauseButton"
+            >
+                ⏸ Pause
+            </button>
+
+        </div>
+
+
+        <!-- ====================
+             手机控制
+        ==================== -->
+
+        <div class="controls">
+
+            <button id="upButton">
+                ⬆️
+            </button>
+
+            <div class="middle-buttons">
+
+                <button id="leftButton">
+                    ⬅️
+                </button>
+
+                <button id="downButton">
+                    ⬇️
+                </button>
+
+                <button id="rightButton">
+                    ➡️
+                </button>
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
 
-<!-- 重新游戏 / 暂停 -->
-<div class="mainButtons">
-    <button id="restartButton">重新游戏</button>
-    <button id="pauseButton">暂停</button>
-</div>
-
-<!-- 电脑操作说明 -->
-<div class="controls">
-    <p>⬅️ ➡️ 移动</p>
-    <p>⬇️ 加速</p>
-    <p>空格键硬降</p>
-    <p>⬆️ 旋转</p>
-    <p>R 重新游戏</p>
-</div>
-
-<script src="game.js"></script>
+    <script src="game.js"></script>
 
 </body>
+
 </html>
